@@ -37,14 +37,14 @@ export default class StockInformation extends React.Component<IStockInformationP
   // on componentDidMount refresh data
   public componentDidMount(): void {
     if (!this.props.needsConfiguration) {
-      this.loadStockInformation(this.props.stockSymbol, this.props.autoRefresh);
+      this.loadStockInformation(this.props.stockSymbol, this.props.apiKey, this.props.autoRefresh);
     }
   }
 
   // on componentWillReceiveProps refresh data
   public componentWillReceiveProps(nextProps: IStockInformationProps): void {
-    if (nextProps.stockSymbol) {
-      this.loadStockInformation(nextProps.stockSymbol, nextProps.autoRefresh);
+    if (nextProps.stockSymbol && nextProps.stockSymbol.length && nextProps.apiKey && nextProps.apiKey.length) {
+      this.loadStockInformation(nextProps.stockSymbol, nextProps.apiKey, nextProps.autoRefresh);
     }
   }
 
@@ -95,10 +95,10 @@ export default class StockInformation extends React.Component<IStockInformationP
   }
 
   // method to load stock information from external REST API
-  private loadStockInformation(stockSymbol: string, autoRefresh: boolean): void {
+  private loadStockInformation(stockSymbol: string, apiKey: string, autoRefresh: boolean): void {
 
     // double-check to have the API Key
-    if (!this.props.apiKey) {
+    if (!apiKey) {
 
       // if we don't have the API Key, stop the Spinner
       this.setState({
@@ -132,7 +132,7 @@ export default class StockInformation extends React.Component<IStockInformationP
       if (!closeValue) {
 
         const serviceDailyEndpoint: string =
-          `https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=${escape(stockSymbol)}&apikey=${this.props.apiKey}`;
+          `https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=${escape(stockSymbol)}&apikey=${apiKey}`;
 
         // request stock information to the REST API
         this.props.httpClient
@@ -157,7 +157,7 @@ export default class StockInformation extends React.Component<IStockInformationP
       }
 
       const serviceIntradayEndpoint: string =
-       `https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol=${escape(stockSymbol)}&interval=1min&apikey=${this.props.apiKey}`;
+       `https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol=${escape(stockSymbol)}&interval=1min&apikey=${apiKey}`;
 
       // request stock information to the REST API
       this.props.httpClient
@@ -227,7 +227,7 @@ export default class StockInformation extends React.Component<IStockInformationP
       // handle autoRefresh logic
       if (autoRefresh) {
         // if autoRefresh is enabled, refresh data every 60sec
-        setTimeout(() => { this.loadStockInformation(stockSymbol, autoRefresh); }, 60000);
+        setTimeout(() => { this.loadStockInformation(stockSymbol, apiKey, autoRefresh); }, 60000);
       }
     }
   }

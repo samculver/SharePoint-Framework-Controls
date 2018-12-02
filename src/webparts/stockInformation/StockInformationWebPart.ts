@@ -95,8 +95,11 @@ export default class StockInformationWebPart extends BaseClientSideWebPart<IStoc
   // method to determine if the web part has to be configured
   private needsConfiguration(): boolean {
     // as long as we don't have the stock symbol, we need configuration
-    return !this.properties.apiKey && (!this.properties.stockSymbol ||
-      this.properties.stockSymbol.length === 0);
+    if(!this.properties.apiKey || !this.properties.stockSymbol ||
+      this.properties.stockSymbol.length === 0){
+        return true;
+      }
+    return false;
   }
 
 }
