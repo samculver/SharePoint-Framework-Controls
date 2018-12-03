@@ -4,56 +4,36 @@ import styles from './Chart.module.scss';
 export interface IChartProps {
     // ?? props or state?
     data: Array<any>
-}
-
-// could maybe be a stateless component
-export interface IChartState {
     svgHeight: number;
     svgWidth: number;
-    data: Array<any>;
+}
+
+// could maybe be a stateless ?
+export interface IChartState {
+    
 }
 
 export default class Chart extends React.Component<IChartProps, IChartState> {
 
-    constructor(props: IChartProps) {
-      super(props);
-      this.state = {
-        svgHeight: 300,  
-        svgWidth: 700,
-        data: this.createFakeData()
-      };
-    }
-
     public render(): React.ReactElement<IChartProps> {
 
-        const width = this.state.svgWidth;
-        const height = this.state.svgHeight;
+        const width = this.props.svgWidth;
+        const height = this.props.svgHeight;
         const maxValue = 123; // ??
         const xAxisLabels = ['1','2'];
         const yAxisLabels = ['a','b'];
+        const {data} = this.props;
 
         return (
             
             <div className={`${styles.chartContainer}`}>
-                <svg viewBox={`0 0 ${this.state.svgWidth} ${this.state.svgHeight}`}>
-                    <Line data={this.state.data} width={width} height={height} />
+                <svg viewBox={`0 0 ${this.props.svgWidth} ${this.props.svgHeight}`}>
+                    <Line data={data} width={width} height={height} />
                     <XAxis labels={ xAxisLabels } maxValue={ maxValue } width={ width } height={ height } />
                     <YAxis labels={ yAxisLabels } width={ width } height={ height } />
                 </svg>
             </div>
         );
-    }
-
-    private createFakeData(){
-        // This function creates data that doesn't look entirely random
-        const data = []
-        for (let x = 0; x <= 30; x++) {
-            const random = Math.random();
-            const temp = data.length > 0 ? data[data.length-1].y : 50;
-            const y = random >= .45 ? temp + Math.floor(random * 20) : temp - Math.floor(random * 20);
-            data.push({x,y})
-        }
-        return data;
     }
 }
 
@@ -61,7 +41,8 @@ export class Line extends React.Component<any, any> {
 
     public render(): React.ReactElement<any> {
 
-        const {data, color} = this.props;
+        const {data} = this.props;
+        console.log(data);
         let pathData = "M " + this.getSvgX(data[0].x) + " " + this.getSvgY(data[0].y) + " ";
 
         pathData += data.map((point, i) => {
@@ -69,7 +50,7 @@ export class Line extends React.Component<any, any> {
         });
 
         return (
-            <path className={`${styles.linePath}`} d={pathData} style={{stroke: '#2196F3'}} />
+            <path className={`${styles.linePath}`} d={pathData} />
         );
     }
 
@@ -90,12 +71,12 @@ export class Line extends React.Component<any, any> {
         return data.reduce((max, p) => p.y > max ? p.y : max, data[0].y);
     }
     private getSvgX(x) {
-        const {svgWidth} = this.props;
-        return (x / this.getMaxX() * svgWidth);
+        const {width} = this.props;
+        return (x / this.getMaxX() * width);
     }
     private getSvgY(y) {
-        const {svgHeight} = this.props;
-        return svgHeight - (y / this.getMaxY() * svgHeight);
+        const {height} = this.props;
+        return height - (y / this.getMaxY() * height);
     }
 }
 
